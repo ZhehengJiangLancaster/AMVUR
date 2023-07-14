@@ -1,0 +1,19 @@
+{
+    "data_dir":"../MeshTransformer/datasets",
+    "train_txt": "HO3D_v2/train.txt",
+    "val_txt": "HO3D_v2/evaluation.txt",
+    "arch": "hrnet-w64",
+    "num_workers": 16,
+    "per_gpu_train_batch_size": 16,
+    "per_gpu_eval_batch_size": 32,
+    "num_hidden_layers":4,
+    "num_attention_heads":4,
+    "lr":1e-4,
+    "num_train_epochs":40,
+    "input_feat_dim":"2051,512,128",
+    "hidden_feat_dim": "1024,256,64",
+    "hidden_feat_dim": "1024,256,64",
+    "output_dir": "output/HO3D_v2/test/",
+    "resume_checkpoint": "pre_trained/state_dict.bin",
+    "run_eval_only": true
+}
