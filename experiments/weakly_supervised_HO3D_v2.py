@@ -193,7 +193,7 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         loss_texture = photo_loss(images, rendered_hand, mask)
             
         # we empirically use hyperparameters to balance difference losses
-        loss = loss_reconstruction + loss_KLD*0.1 + loss_texture*0.0001
+        loss = loss_reconstruction + loss_KLD*0.1 +loss_texture*0.001
 
         # update logs
         log_loss_2djoints.update(loss_2d_joints.item(), batch_size)
@@ -202,7 +202,7 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         log_losses.update(loss.item(), batch_size)
         log_loss_reconstruction.update(loss_reconstruction.item(), batch_size)
         log_loss_KLD.update(loss_KLD.item(), batch_size)
-        # log_loss_texture.update(loss_texture.item(), batch_size)
+        log_loss_texture.update(loss_texture.item(), batch_size)
 
         # back prop
         optimizer.zero_grad()
@@ -239,7 +239,7 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
                 visual_imgs = visual_imgs.transpose(0,1)
                 visual_imgs = visual_imgs.transpose(1,2)
                 visual_imgs = np.asarray(visual_imgs)
-            
+
                 if is_main_process()==True:
                     stamp = str(epoch) + '_' + str(iteration)
                     temp_fname = args.output_dir + 'visual_' + stamp + '.jpg'
@@ -331,11 +331,11 @@ def run_inference_hand_mesh(args, val_loader, METRO_model, criterion, criterion_
                                                 MANO_results[2][1].detach(),
                                                 vis_rendered_hand,
                                                 mano_face=mano_model.face)
-            
+
                 visual_imgs = visual_imgs.transpose(0,1)
                 visual_imgs = visual_imgs.transpose(1,2)
                 visual_imgs = np.asarray(visual_imgs)
-            
+
                 inference_setting = 'sc%02d_rot%s'%(int(args.sc*10),str(int(args.rot)))
                 temp_fname = args.output_dir + 'HO3D_results_'+inference_setting+'_batch'+str(i)+'.jpg'
                 cv2.imwrite(temp_fname, np.asarray(visual_imgs[:,:,::-1]*255))

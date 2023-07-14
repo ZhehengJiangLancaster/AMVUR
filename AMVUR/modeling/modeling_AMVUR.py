@@ -447,10 +447,8 @@ class AMVUR_Hand_Network(torch.nn.Module):
         MANO_results = [pred_3d_joints_mano,pred_vertices_mano,pred_2d_joints_mano,tsa_poses,jv_var]
 
         ### texture regression
-        rendered_image=[]
-        mask=[]
-        # rendered_image, mask = self.occlusion_aware_texture_regression(images, spatial_feat, pred_vertices_mano_mu, camera_param,
-        #                                                         renderer, mesh_model.face, ortho_proj)
+        rendered_image, mask = self.occlusion_aware_texture_regression(images, spatial_feat, pred_vertices_mano_mu, camera_param,
+                                                                renderer, mesh_model.face, ortho_proj)
 
 
         return camera_param, AMVUR_results, MANO_results, [rendered_image, mask]
