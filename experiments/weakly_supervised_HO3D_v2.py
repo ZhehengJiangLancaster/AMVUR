@@ -190,10 +190,10 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
                    pose_var_loss(MANO_results[4])
 
         # compute texture loss
-        # loss_texture = photo_loss(images, rendered_hand, mask)
+        loss_texture = photo_loss(images, rendered_hand, mask)
             
         # we empirically use hyperparameters to balance difference losses
-        loss = loss_reconstruction + loss_KLD*0.1
+        loss = loss_reconstruction + loss_KLD*0.1 + loss_texture*0.0001
 
         # update logs
         log_loss_2djoints.update(loss_2d_joints.item(), batch_size)
@@ -224,26 +224,26 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
                     log_losses.avg, log_loss_2djoints.avg, log_loss_3djoints.avg, log_loss_vertices.avg, log_loss_reconstruction.avg,log_loss_KLD.avg,log_loss_KLD.avg, batch_time.avg, data_time.avg,
                     optimizer.param_groups[0]['lr'])
             )
-            # if iteration % 500 == 1 or iteration == max_iter:
-            #     unorm = UnNormalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
-            #     vis_rendered_hand = rendered_hand * mask + images * (~mask)
-            #     vis_rendered_hand = unorm(vis_rendered_hand.detach())
-            #     visual_imgs = visualize_mesh(   renderer,
-            #                                     annotations['ori_img'].detach(),
-            #                                     annotations['joints_2d'].detach(),
-            #                                     pred_vertices_mano_mu.detach(),
-            #                                     pred_camera[1].detach(),
-            #                                     pred_2d_joints_mano.detach(),
-            #                                     vis_rendered_hand,
-            #                                     mano_face=mano_model.face)
-            #     visual_imgs = visual_imgs.transpose(0,1)
-            #     visual_imgs = visual_imgs.transpose(1,2)
-            #     visual_imgs = np.asarray(visual_imgs)
-            #
-            #     if is_main_process()==True:
-            #         stamp = str(epoch) + '_' + str(iteration)
-            #         temp_fname = args.output_dir + 'visual_' + stamp + '.jpg'
-            #         cv2.imwrite(temp_fname, np.asarray(visual_imgs[:,:,::-1]*255))
+            if iteration % 500 == 1 or iteration == max_iter:
+                unorm = UnNormalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+                vis_rendered_hand = rendered_hand * mask + images * (~mask)
+                vis_rendered_hand = unorm(vis_rendered_hand.detach())
+                visual_imgs = visualize_mesh(   renderer,
+                                                annotations['ori_img'].detach(),
+                                                annotations['joints_2d'].detach(),
+                                                pred_vertices_mano_mu.detach(),
+                                                pred_camera[1].detach(),
+                                                pred_2d_joints_mano.detach(),
+                                                vis_rendered_hand,
+                                                mano_face=mano_model.face)
+                visual_imgs = visual_imgs.transpose(0,1)
+                visual_imgs = visual_imgs.transpose(1,2)
+                visual_imgs = np.asarray(visual_imgs)
+            
+                if is_main_process()==True:
+                    stamp = str(epoch) + '_' + str(iteration)
+                    temp_fname = args.output_dir + 'visual_' + stamp + '.jpg'
+                    cv2.imwrite(temp_fname, np.asarray(visual_imgs[:,:,::-1]*255))
 
         iteration_time = time.time()
 
@@ -319,26 +319,26 @@ def run_inference_hand_mesh(args, val_loader, METRO_model, criterion, criterion_
                 pred_3d_joints_from_mesh_list = pred_3d_joints_from_mesh_n.tolist()
                 joint_output_save.append(pred_3d_joints_from_mesh_list)
 
-            # if i%20==0:
-            #     unorm = UnNormalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
-            #     vis_rendered_hand = rendered_hand * mask + images * (~mask)
-            #     vis_rendered_hand = unorm(vis_rendered_hand.detach())
-            #     visual_imgs = visualize_mesh(   renderer,
-            #                                     annotations['ori_img'].detach(),
-            #                                     annotations['joints_2d'].detach(),
-            #                                     MANO_results[1][1].detach(),
-            #                                     pred_camera.detach(),
-            #                                     MANO_results[2][1].detach(),
-            #                                     vis_rendered_hand,
-            #                                     mano_face=mano_model.face)
-            #
-            #     visual_imgs = visual_imgs.transpose(0,1)
-            #     visual_imgs = visual_imgs.transpose(1,2)
-            #     visual_imgs = np.asarray(visual_imgs)
-            #
-            #     inference_setting = 'sc%02d_rot%s'%(int(args.sc*10),str(int(args.rot)))
-            #     temp_fname = args.output_dir + 'HO3D_results_'+inference_setting+'_batch'+str(i)+'.jpg'
-            #     cv2.imwrite(temp_fname, np.asarray(visual_imgs[:,:,::-1]*255))
+            if i%20==0:
+                unorm = UnNormalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225))
+                vis_rendered_hand = rendered_hand * mask + images * (~mask)
+                vis_rendered_hand = unorm(vis_rendered_hand.detach())
+                visual_imgs = visualize_mesh(   renderer,
+                                                annotations['ori_img'].detach(),
+                                                annotations['joints_2d'].detach(),
+                                                MANO_results[1][1].detach(),
+                                                pred_camera.detach(),
+                                                MANO_results[2][1].detach(),
+                                                vis_rendered_hand,
+                                                mano_face=mano_model.face)
+            
+                visual_imgs = visual_imgs.transpose(0,1)
+                visual_imgs = visual_imgs.transpose(1,2)
+                visual_imgs = np.asarray(visual_imgs)
+            
+                inference_setting = 'sc%02d_rot%s'%(int(args.sc*10),str(int(args.rot)))
+                temp_fname = args.output_dir + 'HO3D_results_'+inference_setting+'_batch'+str(i)+'.jpg'
+                cv2.imwrite(temp_fname, np.asarray(visual_imgs[:,:,::-1]*255))
 
     print('save results to pred.json')
     with open('pred.json', 'w') as f:
