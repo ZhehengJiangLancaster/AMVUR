@@ -13,6 +13,10 @@ This is a PyTorch implementation of our paper: [A Probabilistic Attention Model 
 ## Pytorch MANO layer
 * Download [manopth](https://github.com/hassony2/manopth), and put the file to `${REPO_DIR}/manopth`.
 * Download `MANO_RIGHT.pkl` from [here](https://mano.is.tue.mpg.de/), and put the file to `${REPO_DIR}/AMVUR/modeling/data`.
+## Backbone Download
+Download the `cls_hrnet_w64_sgd_lr5e-2_wd1e-4_bs32_x100.yaml` and `hrnetv2_w64_imagenet_pretrained.pth` from [HRNet models](https://github.com/HRNet/HRNet-Image-Classification), and put them to `${REPO_DIR}/models/hrnet`.
+
+
 ## Experiment
 * Supervised Experiment
   
