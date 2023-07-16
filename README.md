@@ -24,21 +24,21 @@ Download the `cls_hrnet_w64_sgd_lr5e-2_wd1e-4_bs32_x100.yaml` and `hrnetv2_w64_i
   
   Run:
   
-```bash
+  ```bash
   python -m torch.distributed.launch --nproc_per_node=4 \
        experiments/supervised_HO3D_v2.py \
        --config_json ./experiments/config/test.json
-```
+  ```
 
   It will generate a prediction file called `pred.zip`. Afte that, please submit the prediction file to [codalab challenge](https://competitions.codalab.org/competitions/22485) and see the results.
 
   Training:
   
-```bash
+  ```bash
   python -m torch.distributed.launch --nproc_per_node=4 \
        experiments/supervised_HO3D_v2.py \
        --config_json ./experiments/config/train.json
-```
+  ```
 
 * Weakly Supervised Experiment
   
@@ -51,11 +51,11 @@ Download the `cls_hrnet_w64_sgd_lr5e-2_wd1e-4_bs32_x100.yaml` and `hrnetv2_w64_i
   
   Training:
   
-```bash
+  ```bash
   python -m torch.distributed.launch --nproc_per_node=4 \
        experiments/weakly_supervised_HO3D_v2.py \
        --config_json ./experiments/config/train.json
-```
+  ```
 
 ## Citation
 ```text
