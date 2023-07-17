@@ -27,7 +27,7 @@ from AMVUR.utils.comm import synchronize, is_main_process, get_rank
 from AMVUR.utils.miscellaneous import mkdir, set_seed
 from AMVUR.utils.metric_logger import AverageMeter
 from AMVUR.utils.renderer import Renderer,visualize_reconstruction
-from AMVUR.utils.loss_function import keypoint_2d_loss,keypoint_3d_loss,vertices_loss,KLD_vertices_loss,KLD_3d_joints_loss,KLD_camera_loss,tsa_pose_loss,pose_var_loss,photo_loss
+from AMVUR.utils.loss_function import keypoint_2d_loss,keypoint_3d_loss,vertices_loss,KLD_vertices_loss,KLD_3d_joints_loss,KLD_camera_loss,tsa_pose_loss,pose_var_loss,photo_loss,reconstruction_loss
 
 def save_checkpoint(model, args, epoch, iteration, num_trial=10):
     checkpoint_dir = op.join(args.output_dir, 'checkpoint-{}-{}'.format(
@@ -180,12 +180,11 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         loss_3d_joints = keypoint_3d_loss(criterion_keypoints, pred_3d_joints_mano_mu, gt_3d_joints_with_tag, has_3d_joints)
         loss_2d_joints = keypoint_2d_loss(criterion_2d_keypoints, pred_2d_joints_mano, gt_2d_joints, has_2d_joints)
 
-        loss_reconstruction = 0*keypoint_3d_loss(criterion_keypoints, pred_3d_joints_mano, gt_3d_joints_with_tag, has_3d_joints)+ \
-                              keypoint_2d_loss(criterion_2d_keypoints, pred_2d_joints_mano, gt_2d_joints, has_2d_joints)+ \
-                              tsa_pose_loss(MANO_results[3])*0.02
-
-        loss_KLD = 0.1*KLD_3d_joints_loss(pred_3d_joints_mu,pred_3d_joints_var,pred_3d_joints_mano_mu,pred_3d_joints_mano_var)+\
-                   0.1*KLD_vertices_loss(pred_vertices_mu, pred_vertices_var, pred_vertices_mano_mu,pred_vertices_mano_var)+\
+        loss_reconstruction = reconstruction_loss(criterion_2d_keypoints, mano_model, pred_camera[0], MANO_results[3],
+                                                  pred_vertices_mano, pred_3d_joints_mano, pred_2d_joints_mano,
+                                                  gt_2d_joints, has_2d_joints)
+        loss_KLD = 0.01*KLD_3d_joints_loss(pred_3d_joints_mu,pred_3d_joints_var,pred_3d_joints_mano_mu,pred_3d_joints_mano_var)+\
+                   0.01*KLD_vertices_loss(pred_vertices_mu, pred_vertices_var, pred_vertices_mano_mu,pred_vertices_mano_var)+\
                    KLD_camera_loss(pred_camera[1],pred_camera[2],Ks_crop,norm_param=images.shape[-1]*2)+\
                    pose_var_loss(MANO_results[4])
 
@@ -193,7 +192,10 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         loss_texture = photo_loss(images, rendered_hand, mask)
             
         # we empirically use hyperparameters to balance difference losses
-        loss = loss_reconstruction + loss_KLD*0.1 +loss_texture*0.001
+        if epoch<=20:
+            loss = loss_reconstruction + loss_KLD*0.1 +loss_texture*0
+        else:
+            loss = loss_reconstruction + loss_KLD * 0.1 + loss_texture * 0.0001
 
         # update logs
         log_loss_2djoints.update(loss_2d_joints.item(), batch_size)
@@ -327,7 +329,7 @@ def run_inference_hand_mesh(args, val_loader, METRO_model, criterion, criterion_
                                                 annotations['ori_img'].detach(),
                                                 annotations['joints_2d'].detach(),
                                                 MANO_results[1][1].detach(),
-                                                pred_camera.detach(),
+                                                pred_camera[1].detach(),
                                                 MANO_results[2][1].detach(),
                                                 vis_rendered_hand,
                                                 mano_face=mano_model.face)

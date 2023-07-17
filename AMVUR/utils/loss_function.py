@@ -1,5 +1,6 @@
 import torch
 import numpy as np
+from AMVUR.utils.projection_utils import proj_func,camparam2Ks
 def keypoint_2d_loss(criterion_keypoints, pred_keypoints_2d, gt_keypoints_2d, has_pose_2d):
     """
     Compute 2D reprojection loss if 2D keypoint annotations are available.
@@ -26,6 +27,19 @@ def keypoint_3d_loss(criterion_keypoints, pred_keypoints_3d, gt_keypoints_3d, ha
         return (conf * criterion_keypoints(pred_keypoints_3d, gt_keypoints_3d)).mean()
     else:
         return torch.FloatTensor(1).fill_(0.).cuda()
+
+def reconstruction_loss(criterion_keypoints, mesh_model, pred_camera, tsa_pose, pred_vertices, pred_keypoints_3d, pred_keypoints_2d, gt_keypoints_2d, has_pose_2d):
+    loss_tsa_pose = tsa_pose_loss(tsa_pose) * 0.02
+    pred_3d_joints_from_mesh = mesh_model.get_3d_joints(pred_vertices)
+    Ks = camparam2Ks(pred_camera, 224 * 2)
+    pred_2d_joints_from_mesh = proj_func(pred_3d_joints_from_mesh, Ks) / 224
+    pred_2d_joints_from_3d_joints = proj_func(pred_keypoints_3d, Ks) / 224
+    loss = loss_tsa_pose + \
+           keypoint_2d_loss(criterion_keypoints, pred_2d_joints_from_mesh, gt_keypoints_2d, has_pose_2d) + \
+           keypoint_2d_loss(criterion_keypoints, pred_2d_joints_from_3d_joints, gt_keypoints_2d, has_pose_2d) + \
+           keypoint_2d_loss(criterion_keypoints, pred_keypoints_2d, gt_keypoints_2d, has_pose_2d)
+
+    return loss
 
 def vertices_loss(criterion_vertices, pred_vertices, gt_vertices, has_mesh):
     """
