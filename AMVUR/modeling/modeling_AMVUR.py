@@ -256,13 +256,6 @@ class AMVUR_Hand_Network(torch.nn.Module):
         normal_init(self.trans_reg[1],std=0.001)
         nn.init.constant_(self.trans_reg[1].bias[2],0.65)
 
-        normal_init(self.ks_reg[0], std=0.001)
-        normal_init(self.ks_reg[1], std=0.001)
-        nn.init.constant_(self.ks_reg[1].bias[0], 0.45)
-        nn.init.constant_(self.ks_reg[1].bias[1], 0.1)
-        nn.init.constant_(self.ks_reg[1].bias[2], 0.45)
-        nn.init.constant_(self.ks_reg[1].bias[3], 0.1)
-
 
     def reparameterize(self, mu, log_var, s=0.001):
         """
