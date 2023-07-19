@@ -192,7 +192,7 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         loss_texture = photo_loss(images, rendered_hand, mask)
             
         # we empirically use hyperparameters to balance difference losses
-        if epoch<=20:
+        if epoch<=15:
             loss = loss_reconstruction + loss_KLD*0.1 +loss_texture*0
         else:
             loss = loss_reconstruction + loss_KLD * 0.1 + loss_texture * 0.0001
