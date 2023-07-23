@@ -1,5 +1,5 @@
 {
-    "data_dir":"../MeshTransformer/datasets",
+    "data_dir":"./datasets",
     "train_txt": "HO3D_v2/train.txt",
     "val_txt": "HO3D_v2/evaluation.txt",
     "arch": "hrnet-w64",
