@@ -183,8 +183,8 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         loss_reconstruction = reconstruction_loss(criterion_2d_keypoints, mano_model, pred_camera[0], MANO_results[3],
                                                   pred_vertices_mano, pred_3d_joints_mano, pred_2d_joints_mano,
                                                   gt_2d_joints, has_2d_joints)
-        loss_KLD = 0.01*KLD_3d_joints_loss(pred_3d_joints_mu,pred_3d_joints_var,pred_3d_joints_mano_mu,pred_3d_joints_mano_var)+\
-                   0.01*KLD_vertices_loss(pred_vertices_mu, pred_vertices_var, pred_vertices_mano_mu,pred_vertices_mano_var)+\
+        loss_KLD = KLD_3d_joints_loss(pred_3d_joints_mu,pred_3d_joints_var,pred_3d_joints_mano_mu,pred_3d_joints_mano_var)+\
+                   KLD_vertices_loss(pred_vertices_mu, pred_vertices_var, pred_vertices_mano_mu,pred_vertices_mano_var)+\
                    KLD_camera_loss(pred_camera[1],pred_camera[2],Ks_crop,norm_param=images.shape[-1]*2)+\
                    pose_var_loss(MANO_results[4])
 
@@ -192,7 +192,7 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
         loss_texture = photo_loss(images, rendered_hand, mask)
             
         # we empirically use hyperparameters to balance difference losses
-        if epoch<=15:
+        if epoch<=20:
             loss = loss_reconstruction + loss_KLD*0.1 +loss_texture*0
         else:
             loss = loss_reconstruction + loss_KLD * 0.1 + loss_texture * 0.0001

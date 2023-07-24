@@ -256,6 +256,12 @@ class AMVUR_Hand_Network(torch.nn.Module):
         normal_init(self.trans_reg[1],std=0.001)
         nn.init.constant_(self.trans_reg[1].bias[2],0.65)
 
+        normal_init(self.ks_reg[0], std=0.001)
+        normal_init(self.ks_reg[1], std=0.001)
+        nn.init.constant_(self.ks_reg[1].bias[0], 0.45)
+        nn.init.constant_(self.ks_reg[1].bias[1], 0.1)
+        nn.init.constant_(self.ks_reg[1].bias[2], 0.45)
+
 
     def reparameterize(self, mu, log_var, s=0.001):
         """
@@ -303,8 +309,8 @@ class AMVUR_Hand_Network(torch.nn.Module):
             vertices_2d_norm = proj_func(vertices, Ks_i) / res
             ###convert to openGL coordinate
             vertices = vertices * torch.from_numpy(np.asarray([-1, -1, 1])).unsqueeze(0).float().to(device)
-            focal_length = cam_param[:, [0, 2]]
-            camera_center = cam_param[:, [1, 3]]
+            focal_length = cam_param[:, [0, 2]]*images.shape[-1] * 2
+            camera_center = cam_param[:, [1, 3]]*images.shape[-1] * 2
             camera_t = torch.from_numpy(np.array([0, 0, 0])).unsqueeze(0).float().to(device)
             renderer.camera_config(res, focal_length, camera_center, camera_t, has_lights=True)
         vertices_feature = self.inverse_interpolation(spatial_feat, vertices_2d_norm)
@@ -418,6 +424,8 @@ class AMVUR_Hand_Network(torch.nn.Module):
             camera_param_var = self.ks_var_reg(image_feat_ori)
             camera_param_sample_scale = self.samp_ks_scale(camera_param_var)
             camera_param_sample = self.reparameterize(camera_param_mu, camera_param_var, camera_param_sample_scale)
+            camera_param_sample = torch.abs(camera_param_sample)
+            camera_param_mu = torch.abs(camera_param_mu)
             Ks = camparam2Ks(camera_param_sample, images.shape[-1] * 2)
             camera_param = [camera_param_sample, camera_param_mu, camera_param_var]
             pred_2d_joints_mano_from_mesh_mu = proj_func(pred_3d_joints_mano_from_mesh_mu, Ks)/images.shape[-1]
