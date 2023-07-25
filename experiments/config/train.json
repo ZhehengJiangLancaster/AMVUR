@@ -11,5 +11,6 @@
     "lr":0.5e-4,
     "num_train_epochs":40,
     "input_feat_dim":"2051,512,128",
-    "hidden_feat_dim": "1024,256,64"
+    "hidden_feat_dim": "1024,256,64",
+    "output_dir": "output/HO3D_v2/test/"
 }
