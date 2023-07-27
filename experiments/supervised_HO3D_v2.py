@@ -237,6 +237,7 @@ def run(args, train_dataloader, METRO_model, mano_model, renderer, mesh_sampler)
                                                 annotations['joints_2d'].detach(),
                                                 AMVUR_results[1][1].detach(),
                                                 pred_camera.detach(),
+                                                AMVUR_results[2][1].detach(),
                                                 vis_rendered_hand,
                                                 mano_face=mano_model.face)
                 visual_imgs = visual_imgs.transpose(0,1)
