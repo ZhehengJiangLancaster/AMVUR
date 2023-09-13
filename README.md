@@ -20,7 +20,7 @@ Download the `cls_hrnet_w64_sgd_lr5e-2_wd1e-4_bs32_x100.yaml` and `hrnetv2_w64_i
 ## Experiment
 * Supervised Experiment
   
-  Evaluation: Our pre-trained model can be downloaded from [here](https://livelancsac-my.sharepoint.com/:u:/g/personal/jiangz13_lancaster_ac_uk/Eb4oS3v4MbJFtfYGLrlbmigBO0JJFh5As05v7JvMzaTvGg?e=8O9AU3), and put the file to `${REPO_DIR}/pre_trained`.
+  Evaluation: Our pre-trained model can be downloaded from [here](https://pan.baidu.com/share/init?surl=3RGyNVKT2uPsP5ovikMskA&pwd=pchl), and put the file to `${REPO_DIR}/pre_trained`.
   
   Run:
   
