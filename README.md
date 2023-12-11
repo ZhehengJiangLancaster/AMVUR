@@ -8,8 +8,8 @@ This is a PyTorch implementation of our paper: [A Probabilistic Attention Model 
 * **PyTorch3D** (>=0.3.0)
 ## Data
 * Download the FreiHAND dataset from the [website](https://lmb.informatik.uni-freiburg.de/resources/datasets/FreihandDataset.en.html).
-* Download the HO3D dataset from the [website](https://www.tugraz.at/index.php?id=40231).
-  You need to put them to `${REPO_DIR}/data` file
+* Download the HO3D dataset from the [website](https://www.tugraz.at/index.php?id=40231), and annotation files from [[here](https://drive.google.com/drive/folders/1pmRpgv38PXvlLOODtoxpTYnIpYTkNV6b?usp=sharing)].
+  You need to put HO3D dataset to `${REPO_DIR}/data` file, and annotation files to `${REPO_DIR}/data/HO3D_v2/annotations/` file.
 ## Pytorch MANO layer
 * Download [manopth](https://github.com/hassony2/manopth), and put the file to `${REPO_DIR}/manopth`.
 * Download `MANO_RIGHT.pkl` from [here](https://mano.is.tue.mpg.de/), and put the file to `${REPO_DIR}/AMVUR/modeling/data`.
